@@ -138,10 +138,30 @@ func (s *Server) initializeComponents(initOptions types.InitOptions) error {
 	s.trees = trees.NewManager(s.documents, s.languages)
 	s.symbols = symbols.NewIndex(s.storage, s.documents, s.trees, s.languages)
 	
+	// 加载语言配置
+	var langConfigs []types.LanguageConfig
+	
+	// 首先尝试加载内置语言包
+	builtinConfigs, err := languages.LoadBuiltinLanguages()
+	if err != nil {
+		log.Printf("Failed to load builtin languages: %v", err)
+	} else {
+		langConfigs = append(langConfigs, builtinConfigs...)
+		log.Printf("Loaded %d builtin language packages", len(builtinConfigs))
+	}
+	
+	// 如果有传入的配置，也加载它们
+	if len(initOptions.SupportedLanguages) > 0 {
+		langConfigs = append(langConfigs, initOptions.SupportedLanguages...)
+		log.Printf("Added %d configured languages", len(initOptions.SupportedLanguages))
+	}
+	
 	// 初始化语言配置
-	if err := s.languages.Initialize(initOptions.SupportedLanguages); err != nil {
+	if err := s.languages.Initialize(langConfigs); err != nil {
 		return fmt.Errorf("failed to initialize languages: %w", err)
 	}
+	
+	log.Printf("Initialized %d total language configurations", len(langConfigs))
 	
 	// 创建providers
 	s.providers = []types.Provider{
@@ -363,6 +383,22 @@ func (s *Server) SetLanguageData(languageID string, data types.LanguageData) err
 // ProcessSymbolIndex 处理符号索引
 func (s *Server) ProcessSymbolIndex(maxFiles int) error {
 	return s.symbols.ProcessFiles(maxFiles)
+}
+
+// LoadLanguagesFromDirectory 从目录加载语言包
+func (s *Server) LoadLanguagesFromDirectory(packagesDir string) error {
+	configs, err := languages.LoadLanguagesFromDirectory(packagesDir)
+	if err != nil {
+		return err
+	}
+	
+	if s.languages != nil {
+		// 如果语言管理器已经初始化，添加新的配置
+		return s.languages.Initialize(configs)
+	}
+	
+	log.Printf("Loaded %d language packages from directory %s", len(configs), packagesDir)
+	return nil
 }
 
 // Close 关闭服务器

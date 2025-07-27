@@ -17,8 +17,9 @@ import (
 
 func main() {
 	var (
-		mode = flag.String("mode", "stdio", "communication mode (stdio, tcp)")
-		addr = flag.String("addr", ":4389", "server address (for tcp mode)")
+		mode        = flag.String("mode", "stdio", "communication mode (stdio, tcp)")
+		addr        = flag.String("addr", ":4389", "server address (for tcp mode)")
+		packagesDir = flag.String("packages", "", "directory containing language packages (optional)")
 	)
 	flag.Parse()
 
@@ -27,6 +28,13 @@ func main() {
 
 	// 创建服务器
 	srv := server.NewServer(factory)
+	
+	// 如果指定了packages目录，从目录加载语言包
+	if *packagesDir != "" {
+		if err := srv.LoadLanguagesFromDirectory(*packagesDir); err != nil {
+			log.Printf("Warning: failed to load languages from directory %s: %v", *packagesDir, err)
+		}
+	}
 
 	var conn *jsonrpc2.Conn
 	var err error

@@ -1,0 +1,27 @@
+{
+	"name": "anycode-go",
+	"publisher": "ms-vscode",
+	"displayName": "anycode-go",
+	"description": "Go for Anycode",
+	"license": "MIT",
+	"version": "0.0.8",
+	"contributes": {
+		"anycodeLanguages": {
+			"languageId": "go",
+			"extensions": [
+				"go"
+			],
+			"queryPaths": {
+				"comments": "./queries/comments.scm",
+				"folding": "./queries/folding.scm",
+				"identifiers": "./queries/identifiers.scm",
+				"locals": "./queries/locals.scm",
+				"outline": "./queries/outline.scm",
+				"references": "./queries/references.scm"
+			},
+			"suppressedBy": [
+				"golang.Go"
+			]
+		}
+	}
+}

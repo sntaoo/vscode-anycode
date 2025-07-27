@@ -37,6 +37,7 @@ type FeatureConfig struct {
 type LanguageConfig struct {
 	Info    LanguageInfo  `json:"info"`
 	Feature FeatureConfig `json:"feature"`
+	Queries map[string]string `json:"queries,omitempty"` // 查询内容
 }
 
 // LanguageData 语言数据

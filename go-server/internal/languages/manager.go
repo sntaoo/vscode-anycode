@@ -44,9 +44,41 @@ func (m *Manager) Initialize(configs []types.LanguageConfig) error {
 		for _, suffix := range config.Info.Suffixes {
 			m.languageByExtension[suffix] = languageID
 		}
+		
+		// 如果配置中包含查询，直接加载
+		if config.Queries != nil && len(config.Queries) > 0 {
+			m.loadQueriesFromConfig(languageID, config.Queries)
+		}
 	}
 	
 	return nil
+}
+
+// loadQueriesFromConfig 从配置中加载查询
+func (m *Manager) loadQueriesFromConfig(languageID string, queries map[string]string) {
+	// 如果还没有对应的语言，先创建空的查询映射
+	if m.queries[languageID] == nil {
+		m.queries[languageID] = make(map[types.QueryType]*sitter.Query)
+	}
+	
+	// 获取语言实例，如果还没有则跳过（稍后SetLanguageData时会处理）
+	language, exists := m.languages[languageID]
+	if !exists {
+		// 暂存查询内容，等语言加载后再处理
+		return
+	}
+	
+	// 加载查询
+	for queryType, querySource := range queries {
+		if querySource != "" {
+			query, err := sitter.NewQuery([]byte(querySource), language)
+			if err != nil {
+				// 如果查询无效，创建空查询
+				query, _ = sitter.NewQuery([]byte(""), language)
+			}
+			m.queries[languageID][types.QueryType(queryType)] = query
+		}
+	}
 }
 
 // SetLanguageData 设置语言数据
@@ -78,7 +110,31 @@ func (m *Manager) SetLanguageData(languageID string, data types.LanguageData) er
 	}
 	m.queries[languageID] = queries
 	
+	// 如果配置中有查询但之前没有语言，现在可以加载了
+	if config, exists := m.languageConfigs[languageID]; exists && config.Queries != nil {
+		m.loadQueriesFromConfigWithLanguage(languageID, config.Queries, language)
+	}
+	
 	return nil
+}
+
+// loadQueriesFromConfigWithLanguage 使用指定语言从配置中加载查询
+func (m *Manager) loadQueriesFromConfigWithLanguage(languageID string, queries map[string]string, language *sitter.Language) {
+	if m.queries[languageID] == nil {
+		m.queries[languageID] = make(map[types.QueryType]*sitter.Query)
+	}
+	
+	// 加载查询，这些查询会覆盖或补充从LanguageData中加载的查询
+	for queryType, querySource := range queries {
+		if querySource != "" {
+			query, err := sitter.NewQuery([]byte(querySource), language)
+			if err != nil {
+				// 如果查询无效，创建空查询
+				query, _ = sitter.NewQuery([]byte(""), language)
+			}
+			m.queries[languageID][types.QueryType(queryType)] = query
+		}
+	}
 }
 
 // GetLanguage 获取语言

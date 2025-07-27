@@ -56,14 +56,22 @@ go-server/
 - 提供符号信息存储接口
 - 实现内存存储，可扩展为持久化存储
 
+### 6. 语言包系统 (`languages/package.go`)
+- 自动加载anycode语言包
+- 支持内置和外部语言包
+- 解析package.json配置和查询文件
+- 动态功能配置
+
 ## 主要特性
 
 1. **多语言支持**: 通过tree-sitter支持多种编程语言
-2. **增量解析**: 高效的增量解析和缓存机制
-3. **符号索引**: 快速的全局符号索引和查找
-4. **LSP兼容**: 完全兼容Language Server Protocol
-5. **模块化设计**: 清晰的组件分离和接口设计
-6. **高性能**: 基于Go语言的高并发处理能力
+2. **语言包集成**: 自动加载anycode语言包和查询规则
+3. **增量解析**: 高效的增量解析和缓存机制
+4. **符号索引**: 快速的全局符号索引和查找
+5. **LSP兼容**: 完全兼容Language Server Protocol
+6. **模块化设计**: 清晰的组件分离和接口设计
+7. **高性能**: 基于Go语言的高并发处理能力
+8. **嵌入式语言包**: 内置常用语言包，开箱即用
 
 ## 使用方法
 
@@ -79,11 +87,19 @@ go mod tidy
 # 编译
 go build -o anycode-server
 
-# 运行 (stdio模式)
+# 运行 (stdio模式，使用内置语言包)
 ./anycode-server -mode=stdio
+
+# 运行 (stdio模式，同时加载外部语言包)
+./anycode-server -mode=stdio -packages=../
 
 # 运行 (TCP模式)
 ./anycode-server -mode=tcp -addr=:4389
+
+# 使用Makefile构建和运行
+make run-stdio
+make run-stdio-with-packages
+make run-tcp
 ```
 
 ### 集成到编辑器
@@ -124,14 +140,53 @@ type SymbolInfoStorage interface {
 }
 ```
 
+## 语言包系统
+
+### 内置语言包
+
+服务器内置了以下语言包：
+- **Java**: 完整的类、方法、字段、接口支持
+- **Go**: 函数、结构体、接口、变量支持  
+- **Python**: 类、函数、变量支持
+
+### 语言包结构
+
+每个语言包包含：
+```
+anycode-{language}/
+├── package.json          # 语言包配置
+└── queries/              # Tree-sitter查询文件
+    ├── comments.scm      # 注释查询
+    ├── identifiers.scm   # 标识符查询
+    ├── locals.scm        # 局部变量查询
+    ├── outline.scm       # 大纲查询
+    ├── references.scm    # 引用查询
+    └── folding.scm       # 代码折叠查询
+```
+
+### 查询文件说明
+
+- **outline.scm**: 定义类、函数、变量等符号的提取规则
+- **locals.scm**: 定义作用域和局部变量的查询规则
+- **identifiers.scm**: 定义标识符的匹配规则
+- **references.scm**: 定义引用查找的规则
+- **comments.scm**: 定义注释的匹配规则
+- **folding.scm**: 定义代码折叠的规则
+
 ## 扩展开发
 
 ### 添加新的语言支持
 
-1. 准备tree-sitter语法文件
-2. 编写语言特定的查询文件
-3. 在语言管理器中注册新语言
-4. 测试各项LSP功能
+#### 方法1: 创建语言包
+1. 在`internal/languages/packages/`下创建`anycode-{language}`目录
+2. 创建`package.json`配置文件
+3. 在`queries/`目录下添加相应的`.scm`查询文件
+4. 重新编译服务器
+
+#### 方法2: 外部语言包目录
+1. 创建语言包目录结构
+2. 使用`-packages`参数指定目录
+3. 服务器会自动扫描并加载语言包
 
 ### 添加新的LSP功能
 

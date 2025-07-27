@@ -56,6 +56,12 @@ run-stdio:
 run-tcp:
 	$(GOBUILD) -o $(BINARY_NAME) && ./$(BINARY_NAME) -mode=tcp -addr=:4389
 
+run-stdio-with-packages:
+	$(GOBUILD) -o $(BINARY_NAME) && ./$(BINARY_NAME) -mode=stdio -packages=../
+
+run-tcp-with-packages:
+	$(GOBUILD) -o $(BINARY_NAME) && ./$(BINARY_NAME) -mode=tcp -addr=:4389 -packages=../
+
 install:
 	$(GOCMD) install
 
@@ -87,24 +93,31 @@ release: clean deps test build-all
 	tar -czf release/anycode-server-linux.tar.gz -C release $(BINARY_UNIX) README.md
 	zip -j release/anycode-server-windows.zip release/$(BINARY_WINDOWS) release/README.md
 
+test-languages:
+	chmod +x scripts/test-languages.sh
+	./scripts/test-languages.sh
+
 help:
 	@echo "Available targets:"
-	@echo "  build          - Build the binary"
-	@echo "  build-linux    - Build for Linux"
-	@echo "  build-windows  - Build for Windows"
-	@echo "  build-all      - Build for all platforms"
-	@echo "  clean          - Clean build artifacts"
-	@echo "  test           - Run tests"
-	@echo "  test-coverage  - Run tests with coverage"
-	@echo "  deps           - Download dependencies"
-	@echo "  deps-update    - Update dependencies"
-	@echo "  run-stdio      - Build and run in stdio mode"
-	@echo "  run-tcp        - Build and run in TCP mode"
-	@echo "  install        - Install the binary"
-	@echo "  dev-tools      - Install development tools"
-	@echo "  lint           - Run linter"
-	@echo "  format         - Format code"
-	@echo "  docker-build   - Build Docker image"
-	@echo "  docker-run     - Run Docker container"
-	@echo "  release        - Create release packages"
-	@echo "  help           - Show this help"
+	@echo "  build                    - Build the binary"
+	@echo "  build-linux              - Build for Linux"
+	@echo "  build-windows            - Build for Windows"
+	@echo "  build-all                - Build for all platforms"
+	@echo "  clean                    - Clean build artifacts"
+	@echo "  test                     - Run tests"
+	@echo "  test-coverage            - Run tests with coverage"
+	@echo "  test-languages           - Test language package functionality"
+	@echo "  deps                     - Download dependencies"
+	@echo "  deps-update              - Update dependencies"
+	@echo "  run-stdio                - Build and run in stdio mode"
+	@echo "  run-tcp                  - Build and run in TCP mode"
+	@echo "  run-stdio-with-packages  - Build and run with external packages"
+	@echo "  run-tcp-with-packages    - Build and run TCP mode with external packages"
+	@echo "  install                  - Install the binary"
+	@echo "  dev-tools                - Install development tools"
+	@echo "  lint                     - Run linter"
+	@echo "  format                   - Format code"
+	@echo "  docker-build             - Build Docker image"
+	@echo "  docker-run               - Run Docker container"
+	@echo "  release                  - Create release packages"
+	@echo "  help                     - Show this help"
