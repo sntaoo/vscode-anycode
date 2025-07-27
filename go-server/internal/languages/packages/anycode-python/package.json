@@ -1,0 +1,26 @@
+{
+	"name": "anycode-python",
+	"publisher": "ms-vscode",
+	"displayName": "anycode-python",
+	"description": "Python for Anycode",
+	"license": "MIT",
+	"version": "0.0.8",
+	"contributes": {
+		"anycodeLanguages": {
+			"languageId": "python",
+			"extensions": [
+				"py"
+			],
+			"queryPaths": {
+				"comments": "./queries/comments.scm",
+				"identifiers": "./queries/identifiers.scm",
+				"locals": "./queries/locals.scm",
+				"outline": "./queries/outline.scm",
+				"references": "./queries/references.scm"
+			},
+			"suppressedBy": [
+				"ms-python.python"
+			]
+		}
+	}
+}

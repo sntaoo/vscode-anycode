@@ -1,0 +1,27 @@
+{
+	"name": "anycode-java",
+	"publisher": "ms-vscode",
+	"displayName": "anycode-java",
+	"description": "Java for Anycode",
+	"license": "MIT",
+	"version": "0.0.8",
+	"contributes": {
+		"anycodeLanguages": {
+			"languageId": "java",
+			"extensions": [
+				"java"
+			],
+			"queryPaths": {
+				"comments": "./queries/comments.scm",
+				"folding": "./queries/folding.scm",
+				"identifiers": "./queries/identifiers.scm",
+				"locals": "./queries/locals.scm",
+				"outline": "./queries/outline.scm",
+				"references": "./queries/references.scm"
+			},
+			"suppressedBy": [
+				"redhat.java"
+			]
+		}
+	}
+}

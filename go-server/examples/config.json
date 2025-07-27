@@ -1,0 +1,38 @@
+{
+  "server": {
+    "mode": "stdio",
+    "packages": "../",
+    "logLevel": "info"
+  },
+  "features": {
+    "definitions": true,
+    "references": true,
+    "completions": true,
+    "outline": true,
+    "highlights": true,
+    "folding": true,
+    "workspaceSymbols": true
+  },
+  "languages": {
+    "java": {
+      "enabled": true,
+      "suppressedBy": ["redhat.java"]
+    },
+    "go": {
+      "enabled": true,
+      "suppressedBy": ["golang.Go"]
+    },
+    "python": {
+      "enabled": true,
+      "suppressedBy": ["ms-python.python"]
+    },
+    "javascript": {
+      "enabled": true,
+      "extensions": ["js", "jsx"]
+    },
+    "typescript": {
+      "enabled": true,
+      "extensions": ["ts", "tsx"]
+    }
+  }
+}
